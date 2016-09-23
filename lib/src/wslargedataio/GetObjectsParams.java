@@ -31,29 +31,29 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
-    "object_refs",
+    "objects",
     "ignore_errors"
 })
 public class GetObjectsParams {
 
-    @JsonProperty("object_refs")
-    private List<String> objectRefs;
+    @JsonProperty("objects")
+    private List<ObjectSpecification> objects;
     @JsonProperty("ignore_errors")
     private Long ignoreErrors;
-    private Map<java.lang.String, Object> additionalProperties = new HashMap<java.lang.String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("object_refs")
-    public List<String> getObjectRefs() {
-        return objectRefs;
+    @JsonProperty("objects")
+    public List<ObjectSpecification> getObjects() {
+        return objects;
     }
 
-    @JsonProperty("object_refs")
-    public void setObjectRefs(List<String> objectRefs) {
-        this.objectRefs = objectRefs;
+    @JsonProperty("objects")
+    public void setObjects(List<ObjectSpecification> objects) {
+        this.objects = objects;
     }
 
-    public GetObjectsParams withObjectRefs(List<String> objectRefs) {
-        this.objectRefs = objectRefs;
+    public GetObjectsParams withObjects(List<ObjectSpecification> objects) {
+        this.objects = objects;
         return this;
     }
 
@@ -73,18 +73,18 @@ public class GetObjectsParams {
     }
 
     @JsonAnyGetter
-    public Map<java.lang.String, Object> getAdditionalProperties() {
+    public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
     }
 
     @JsonAnySetter
-    public void setAdditionalProperties(java.lang.String name, Object value) {
+    public void setAdditionalProperties(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
 
     @Override
-    public java.lang.String toString() {
-        return ((((((("GetObjectsParams"+" [objectRefs=")+ objectRefs)+", ignoreErrors=")+ ignoreErrors)+", additionalProperties=")+ additionalProperties)+"]");
+    public String toString() {
+        return ((((((("GetObjectsParams"+" [objects=")+ objects)+", ignoreErrors=")+ ignoreErrors)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

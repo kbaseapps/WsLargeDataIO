@@ -83,6 +83,68 @@ module WsLargeDataIO {
     funcdef save_objects(SaveObjectsParams params)
         returns (list<object_info> info) authentication required;
 
+    /* An Object Specification (OS). Inherits from ObjectIdentity.
+        Specifies which object, and which parts of that object, to retrieve
+        from the Workspace Service.
+        
+        The fields wsid, workspace, objid, name, ver, and ref are identical to
+        the ObjectIdentity fields.
+        
+        REFERENCE FOLLOWING:
+        
+        Reference following guarantees that a user that has access to an
+        object can always see a) objects that are referenced inside the object
+        and b) objects that are referenced in the object's provenance. This
+        ensures that the user has visibility into the entire provenance of the
+        object and the object's object dependencies (e.g. references).
+        
+        The user must have at least read access to the object specified in this
+        SO, but need not have access to any further objects in the reference
+        chain, and those objects may be deleted.
+        
+        Optional reference following fields:
+        list<string> obj_ref_path - a path to the desired object from the object
+            specified in this OS. In other words, the object specified in this
+            OS is assumed to be accessible to the user, and the objects in
+            the object path represent a chain of references to the desired
+            object at the end of the object path. If the references are all
+            valid, the desired object will be returned.
+        
+        OBJECT SUBSETS:
+        
+        When selecting a subset of an array in an object, the returned
+        array is compressed to the size of the subset, but the ordering of
+        the array is maintained. For example, if the array stored at the
+        'feature' key of a Genome object has 4000 entries, and the object paths
+        provided are:
+            /feature/7
+            /feature/3015
+            /feature/700
+        The returned feature array will be of length three and the entries will
+        consist, in order, of the 7th, 700th, and 3015th entries of the
+        original array.
+        
+        Optional object subset fields:
+        list<string> included - the portions of the object to include
+                in the object subset.
+        boolean strict_maps - if true, throw an exception if the subset
+            specification traverses a non-existant map key (default false)
+        boolean strict_arrays - if true, throw an exception if the subset
+            specification exceeds the size of an array (default true)
+    */
+    typedef structure {
+        string workspace;
+        int wsid;
+        string name;
+        int objid;
+        int ver;
+        string ref;
+        list<string> obj_ref_path;
+        list<string> included;
+        boolean strict_maps;
+        boolean strict_arrays;
+    } ObjectSpecification;
+    
     /* Input parameters for the "get_objects" function.
     
         Required parameters:
@@ -96,7 +158,7 @@ module WsLargeDataIO {
             and instead insert a null into the returned list.
     */
     typedef structure {
-        list<string> object_refs;
+        list<ObjectSpecification> objects;
         boolean ignore_errors;
     } GetObjectsParams;
     

@@ -4,8 +4,8 @@ import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import junit.framework.Assert;
 
@@ -15,7 +15,9 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import wslargedataio.GetObjectsParams;
 import wslargedataio.ObjectSaveData;
+import wslargedataio.ObjectSpecification;
 import wslargedataio.SaveObjectsParams;
 import wslargedataio.WsLargeDataIOServer;
 import us.kbase.auth.AuthToken;
@@ -78,19 +80,28 @@ public class WsLargeDataIOServerTest {
         }
     }
     
+    @SuppressWarnings("unchecked")
     @Test
-    public void testYourMethod() throws Exception {
+    public void testSaveAndGetObjects() throws Exception {
         File tempFile = new File(config.get("scratch"), "test.json");
-        Map<String, Object> genome = new LinkedHashMap<>();
+        Map<String, Object> genome = new TreeMap<>();
         genome.put("id", "<no>");
         genome.put("scientific_name", "<no>");
         genome.put("domain", "<no>");
         genome.put("genetic_code", -1L);
         FileUtils.writeStringToFile(tempFile, UObject.transformObjectToString(genome));
+        String genomeObjName = "genome.1";
         Object ret = impl.saveObjects(new SaveObjectsParams().withWorkspace(getWsName())
                 .withObjects(Arrays.asList(new ObjectSaveData()
-                .withType("KBaseGenomes.Genome").withName("genome.1")
+                .withType("KBaseGenomes.Genome").withName(genomeObjName)
                 .withDataJsonFile(tempFile.getAbsolutePath()))), token, getContext());
         Assert.assertNotNull(ret);
+        File targetFile = new File(impl.getObjects(new GetObjectsParams().withObjects(
+                Arrays.asList(new ObjectSpecification().withRef(
+                        getWsName() + "/" + genomeObjName))), token, getContext())
+                .getData().get(0).getDataJsonFile());
+        Map<String, Object> obj = UObject.getMapper().readValue(targetFile, Map.class);
+        Assert.assertEquals(UObject.transformObjectToString(genome),
+                UObject.transformObjectToString(new TreeMap<>(obj)));
     }
 }

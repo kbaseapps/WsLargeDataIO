@@ -12,6 +12,7 @@ import us.kbase.common.service.RpcContext;
 import us.kbase.common.service.Tuple11;
 
 //BEGIN_HEADER
+import us.kbase.workspace.ProvenanceAction;
 //END_HEADER
 
 /**
@@ -23,8 +24,8 @@ import us.kbase.common.service.Tuple11;
 public class WsLargeDataIOServer extends JsonServerServlet {
     private static final long serialVersionUID = 1L;
     private static final String version = "0.0.1";
-    private static final String gitUrl = "";
-    private static final String gitCommitHash = "";
+    private static final String gitUrl = "https://github.com/rsutormin/WsLargeDataIO";
+    private static final String gitCommitHash = "370bad8645bb3f977b323b77d110febe46cc3213";
 
     //BEGIN_CLASS_HEADER
     //END_CLASS_HEADER
@@ -48,7 +49,9 @@ public class WsLargeDataIOServer extends JsonServerServlet {
     public List<Tuple11<Long, String, String, String, Long, String, Long, String, String, Long, Map<String,String>>> saveObjects(SaveObjectsParams params, AuthToken authPart, RpcContext jsonRpcContext) throws Exception {
         List<Tuple11<Long, String, String, String, Long, String, Long, String, String, Long, Map<String,String>>> returnVal = null;
         //BEGIN save_objects
-        returnVal = WsLargeDataIOImpl.saveObjects(params, authPart, config);
+        @SuppressWarnings("unchecked")
+        List<ProvenanceAction> provenance = (List<ProvenanceAction>)jsonRpcContext.getProvenance();
+        returnVal = WsLargeDataIOImpl.saveObjects(params, authPart, config, provenance);
         //END save_objects
         return returnVal;
     }

@@ -93,7 +93,47 @@ class WsLargeDataIO(object):
            names if possible to avoid race conditions. Optional parameters:
            ignore_errors - ignore any errors that occur when fetching an
            object and instead insert a null into the returned list.) ->
-           structure: parameter "object_refs" of list of String, parameter
+           structure: parameter "objects" of list of type
+           "ObjectSpecification" (An Object Specification (OS). Inherits from
+           ObjectIdentity. Specifies which object, and which parts of that
+           object, to retrieve from the Workspace Service. The fields wsid,
+           workspace, objid, name, ver, and ref are identical to the
+           ObjectIdentity fields. REFERENCE FOLLOWING: Reference following
+           guarantees that a user that has access to an object can always see
+           a) objects that are referenced inside the object and b) objects
+           that are referenced in the object's provenance. This ensures that
+           the user has visibility into the entire provenance of the object
+           and the object's object dependencies (e.g. references). The user
+           must have at least read access to the object specified in this SO,
+           but need not have access to any further objects in the reference
+           chain, and those objects may be deleted. Optional reference
+           following fields: list<string> obj_ref_path - a path to the
+           desired object from the object specified in this OS. In other
+           words, the object specified in this OS is assumed to be accessible
+           to the user, and the objects in the object path represent a chain
+           of references to the desired object at the end of the object path.
+           If the references are all valid, the desired object will be
+           returned. OBJECT SUBSETS: When selecting a subset of an array in
+           an object, the returned array is compressed to the size of the
+           subset, but the ordering of the array is maintained. For example,
+           if the array stored at the 'feature' key of a Genome object has
+           4000 entries, and the object paths provided are: /feature/7
+           /feature/3015 /feature/700 The returned feature array will be of
+           length three and the entries will consist, in order, of the 7th,
+           700th, and 3015th entries of the original array. Optional object
+           subset fields: list<string> included - the portions of the object
+           to include in the object subset. boolean strict_maps - if true,
+           throw an exception if the subset specification traverses a
+           non-existant map key (default false) boolean strict_arrays - if
+           true, throw an exception if the subset specification exceeds the
+           size of an array (default true)) -> structure: parameter
+           "workspace" of String, parameter "wsid" of Long, parameter "name"
+           of String, parameter "objid" of Long, parameter "ver" of Long,
+           parameter "ref" of String, parameter "obj_ref_path" of list of
+           String, parameter "included" of list of String, parameter
+           "strict_maps" of type "boolean" (A boolean - 0 for false, 1 for
+           true. @range (0, 1)), parameter "strict_arrays" of type "boolean"
+           (A boolean - 0 for false, 1 for true. @range (0, 1)), parameter
            "ignore_errors" of type "boolean" (A boolean - 0 for false, 1 for
            true. @range (0, 1))
         :returns: instance of type "GetObjectsResults" (Results from the
