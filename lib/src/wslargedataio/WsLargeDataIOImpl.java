@@ -17,6 +17,7 @@ public class WsLargeDataIOImpl {
     saveObjects(SaveObjectsParams params, AuthToken token, Map<String, String> config) throws Exception {
         WorkspaceClient wc = new WorkspaceClient(new URL(config.get("workspace-url")), token);
         wc.setIsInsecureHttpConnectionAllowed(true);
+        wc.setStreamingModeOn(true);
         List<us.kbase.workspace.ObjectSaveData> objects = 
                 new ArrayList<us.kbase.workspace.ObjectSaveData>();
         for (ObjectSaveData osd : params.getObjects()) {
