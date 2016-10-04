@@ -28,11 +28,11 @@ compile:
 		--plclname $(SERVICE_CAPS)::$(SERVICE_CAPS)Client \
 		--jsclname javascript/Client \
 		--pyclname $(SERVICE_CAPS).$(SERVICE_CAPS)Client \
-		--html \
 		--javasrc src \
 		--java \
 		--javasrv \
 		--javapackage .;
+	kb-sdk compile --html $(SPEC_FILE)
 
 build:
 	$(ANT) war -Djars.dir=$(JARS_DIR)
