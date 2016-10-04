@@ -46,22 +46,23 @@ class WsLargeDataIO(object):
            String, parameter "objects" of list of type "ObjectSaveData" (An
            object and associated data required for saving. Required
            parameters: type - the workspace type string for the object. Omit
-           the version information to use the latest version. data - the
-           object data. Optional parameters: One of an object name or id. If
-           no name or id is provided the name will be set to 'auto' with the
-           object id appended as a string, possibly with -\d+ appended if
-           that object id already exists as a name. name - the name of the
-           object. objid - the id of the object to save over. meta -
-           arbitrary user-supplied metadata for the object, not to exceed
-           16kb; if the object type specifies automatic metadata extraction
-           with the 'meta ws' annotation, and your metadata name conflicts,
-           then your metadata will be silently overwritten. hidden - true if
-           this object should not be listed when listing workspace objects.)
-           -> structure: parameter "type" of String, parameter
-           "data_json_file" of String, parameter "name" of String, parameter
-           "objid" of Long, parameter "meta" of mapping from String to
-           String, parameter "hidden" of type "boolean" (A boolean - 0 for
-           false, 1 for true. @range (0, 1))
+           the version information to use the latest version. data_json_file
+           - the path to a JSON file containing the object data. Optional
+           parameters: One of an object name or id. If no name or id is
+           provided the name will be set to 'auto' with the object id
+           appended as a string, possibly with -\d+ appended if that object
+           id already exists as a name. name - the name of the object. objid
+           - the id of the object to save over. meta - arbitrary
+           user-supplied metadata for the object, not to exceed 16kb; if the
+           object type specifies automatic metadata extraction with the 'meta
+           ws' annotation, and your metadata name conflicts, then your
+           metadata will be silently overwritten. hidden - true if this
+           object should not be listed when listing workspace objects.) ->
+           structure: parameter "type" of String, parameter "data_json_file"
+           of String, parameter "name" of String, parameter "objid" of Long,
+           parameter "meta" of mapping from String to String, parameter
+           "hidden" of type "boolean" (A boolean - 0 for false, 1 for true.
+           @range (0, 1))
         :returns: instance of list of type "object_info" (Information about
            an object, including user provided metadata. objid - the numerical
            id of the object. name - the name of the object. type - the type

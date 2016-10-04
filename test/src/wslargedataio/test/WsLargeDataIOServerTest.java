@@ -26,6 +26,7 @@ import us.kbase.common.service.JsonServerSyslog;
 import us.kbase.common.service.RpcContext;
 import us.kbase.common.service.UObject;
 import us.kbase.workspace.CreateWorkspaceParams;
+import us.kbase.workspace.GetObjects2Params;
 import us.kbase.workspace.ProvenanceAction;
 import us.kbase.workspace.WorkspaceClient;
 import us.kbase.workspace.WorkspaceIdentity;
@@ -103,5 +104,22 @@ public class WsLargeDataIOServerTest {
         Map<String, Object> obj = UObject.getMapper().readValue(targetFile, Map.class);
         Assert.assertEquals(UObject.transformObjectToString(genome),
                 UObject.transformObjectToString(new TreeMap<>(obj)));
+        
+        /* check provenance is saved correctly
+           just checks that the provenance set in the callback server by the
+           test runner is there, that means the provenance has been correctly
+           pulled from the callback server and saved with the object
+         */
+        final ProvenanceAction prov = wsClient.getObjects2(
+                new GetObjects2Params()
+                    .withNoData(1L)
+                    .withObjects(Arrays.asList(
+                            new us.kbase.workspace.ObjectSpecification()
+                                .withRef(getWsName() + "/" + genomeObjName))))
+                .getData().get(0).getProvenance().get(0);
+        Assert.assertEquals(
+                "KBase SDK method run via the KBase Execution Engine",
+                prov.getDescription());
+        Assert.assertEquals("use_set_provenance", prov.getService());
     }
 }

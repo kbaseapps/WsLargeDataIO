@@ -12,6 +12,14 @@ import us.kbase.common.service.RpcContext;
 import us.kbase.common.service.Tuple11;
 
 //BEGIN_HEADER
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+
+import us.kbase.common.service.JsonClientCaller;
+import us.kbase.common.service.JsonClientException;
 import us.kbase.workspace.ProvenanceAction;
 //END_HEADER
 
@@ -23,16 +31,32 @@ import us.kbase.workspace.ProvenanceAction;
  */
 public class WsLargeDataIOServer extends JsonServerServlet {
     private static final long serialVersionUID = 1L;
-    private static final String version = "0.0.1";
-    private static final String gitUrl = "https://github.com/rsutormin/WsLargeDataIO";
-    private static final String gitCommitHash = "370bad8645bb3f977b323b77d110febe46cc3213";
+    private static final String version = "0.0.2";
+    private static final String gitUrl = "https://github.com/kbaseapps/WsLargeDataIO";
+    private static final String gitCommitHash = "487a9cb7c29e582350151dd9c4c506c05f611ccf";
 
     //BEGIN_CLASS_HEADER
+    
+    private final URL sdkCallbackUrl;
     //END_CLASS_HEADER
 
     public WsLargeDataIOServer() throws Exception {
         super("WsLargeDataIO");
         //BEGIN_CONSTRUCTOR
+        final String sdkURL = System.getenv("SDK_CALLBACK_URL");
+        if (sdkURL == null || sdkURL.isEmpty()) {
+            sdkCallbackUrl = null;
+            System.out.println("No callback URL found");
+        } else {
+            try {
+                sdkCallbackUrl = new URL(sdkURL);
+                System.out.println("WsLargeDataIO got SDK_CALLBACK_URL " +
+                        sdkCallbackUrl);
+            } catch (MalformedURLException e) {
+                throw new IllegalArgumentException(
+                        "Invalid SDK callback url: " + sdkURL);
+            }
+        }
         //END_CONSTRUCTOR
     }
 
@@ -49,9 +73,31 @@ public class WsLargeDataIOServer extends JsonServerServlet {
     public List<Tuple11<Long, String, String, String, Long, String, Long, String, String, Long, Map<String,String>>> saveObjects(SaveObjectsParams params, AuthToken authPart, RpcContext jsonRpcContext) throws Exception {
         List<Tuple11<Long, String, String, String, Long, String, Long, String, String, Long, Map<String,String>>> returnVal = null;
         //BEGIN save_objects
-        @SuppressWarnings("unchecked")
-        List<ProvenanceAction> provenance = (List<ProvenanceAction>)jsonRpcContext.getProvenance();
-        returnVal = WsLargeDataIOImpl.saveObjects(params, authPart, config, provenance);
+        //TODO should move provenance code into JsonServerServlet
+        final List<ProvenanceAction> provenance;
+        if (sdkCallbackUrl == null) {
+            @SuppressWarnings("unchecked")
+            final List<ProvenanceAction> tp =
+                    (List<ProvenanceAction>) jsonRpcContext.getProvenance();
+            provenance = tp;
+        } else {
+            final JsonClientCaller cli = new JsonClientCaller(sdkCallbackUrl);
+            // callback server is never https
+            cli.setInsecureHttpConnectionAllowed(true);
+            cli.setConnectionReadTimeOut(10 * 1000); // 10s should be plenty
+            final List<List<ProvenanceAction>> ret = cli.jsonrpcCall(
+                    "CallbackServer.get_provenance",
+                    new ArrayList<String>(),
+                    new TypeReference<List<List<ProvenanceAction>>>() {},
+                    true, false);
+            if (ret.isEmpty()) {
+                throw new JsonClientException("Invalid response when " +
+                        "fetching provenance from the callback server");
+            }
+            provenance = ret.get(0);
+        }
+        returnVal = WsLargeDataIOImpl.saveObjects(
+                params, authPart, config, provenance);
         //END save_objects
         return returnVal;
     }
