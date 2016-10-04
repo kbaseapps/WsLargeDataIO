@@ -586,7 +586,7 @@ An object and associated data required for saving.
     Required parameters:
     type - the workspace type string for the object. Omit the version
         information to use the latest version.
-    data - the object data.
+    data_json_file - the path to a JSON file containing the object data.
     
     Optional parameters:
     One of an object name or id. If no name or id is provided the name
