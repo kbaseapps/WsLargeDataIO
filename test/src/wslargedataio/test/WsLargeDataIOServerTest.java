@@ -20,8 +20,10 @@ import wslargedataio.ObjectSaveData;
 import wslargedataio.ObjectSpecification;
 import wslargedataio.SaveObjectsParams;
 import wslargedataio.WsLargeDataIOServer;
+import us.kbase.auth.AuthConfig;
 import us.kbase.auth.AuthToken;
 import us.kbase.auth.AuthService;
+import us.kbase.auth.ConfigurableAuthService;
 import us.kbase.common.service.JsonServerSyslog;
 import us.kbase.common.service.RpcContext;
 import us.kbase.common.service.UObject;
@@ -40,14 +42,21 @@ public class WsLargeDataIOServerTest {
     
     @BeforeClass
     public static void init() throws Exception {
-        //TODO AUTH make configurable?
-        token = AuthService.validateToken(System.getenv("KB_AUTH_TOKEN"));
         String configFilePath = System.getenv("KB_DEPLOYMENT_CONFIG");
         File deploy = new File(configFilePath);
         Ini ini = new Ini(deploy);
         config = ini.get("WsLargeDataIO");
+
+        // Token validation
+        String authUrl = config.get("auth-service-url");
+        String authUrlInsecure = config.get("auth-service-url-allow-insecure");
+        ConfigurableAuthService authService = new ConfigurableAuthService(
+                new AuthConfig().withKBaseAuthServerURL(new URL(authUrl))
+                        .withAllowInsecureURLs("true".equals(authUrlInsecure)));
+        token = authService.validateToken(System.getenv("KB_AUTH_TOKEN"));
         wsClient = new WorkspaceClient(new URL(config.get("workspace-url")), token);
         wsClient.setIsInsecureHttpConnectionAllowed(true);
+
         // These lines are necessary because we don't want to start linux syslog bridge service
         JsonServerSyslog.setStaticUseSyslog(false);
         JsonServerSyslog.setStaticMlogFile(new File(config.get("scratch"), "test.log").getAbsolutePath());
@@ -85,24 +94,23 @@ public class WsLargeDataIOServerTest {
     @Test
     public void testSaveAndGetObjects() throws Exception {
         File tempFile = new File(config.get("scratch"), "test.json");
-        Map<String, Object> genome = new TreeMap<>();
-        genome.put("id", "<no>");
-        genome.put("scientific_name", "<no>");
-        genome.put("domain", "<no>");
-        genome.put("genetic_code", -1L);
-        FileUtils.writeStringToFile(tempFile, UObject.transformObjectToString(genome));
-        String genomeObjName = "genome.1";
+        Map<String, Object> taxon = new TreeMap<>();
+        taxon.put("taxonomy_id", 0);
+        taxon.put("domain", "localhost");
+        taxon.put("scientific_name", "Fakus Objectus");
+        FileUtils.writeStringToFile(tempFile, UObject.transformObjectToString(taxon));
+        String taxonObjName = "taxon.1";
         Object ret = impl.saveObjects(new SaveObjectsParams().withWorkspace(getWsName())
                 .withObjects(Arrays.asList(new ObjectSaveData()
-                .withType("KBaseGenomes.Genome").withName(genomeObjName)
+                .withType("KBaseGenomeAnnotations.Taxon").withName(taxonObjName)
                 .withDataJsonFile(tempFile.getAbsolutePath()))), token, getContext());
         Assert.assertNotNull(ret);
         File targetFile = new File(impl.getObjects(new GetObjectsParams().withObjects(
                 Arrays.asList(new ObjectSpecification().withRef(
-                        getWsName() + "/" + genomeObjName))), token, getContext())
+                        getWsName() + "/" + taxonObjName))), token, getContext())
                 .getData().get(0).getDataJsonFile());
         Map<String, Object> obj = UObject.getMapper().readValue(targetFile, Map.class);
-        Assert.assertEquals(UObject.transformObjectToString(genome),
+        Assert.assertEquals(UObject.transformObjectToString(taxon),
                 UObject.transformObjectToString(new TreeMap<>(obj)));
         
         /* check provenance is saved correctly
@@ -115,11 +123,11 @@ public class WsLargeDataIOServerTest {
                     .withNoData(1L)
                     .withObjects(Arrays.asList(
                             new us.kbase.workspace.ObjectSpecification()
-                                .withRef(getWsName() + "/" + genomeObjName))))
+                                .withRef(getWsName() + "/" + taxonObjName))))
                 .getData().get(0).getProvenance().get(0);
         Assert.assertEquals(
                 "KBase SDK method run via the KBase Execution Engine",
                 prov.getDescription());
-        Assert.assertEquals("use_set_provenance", prov.getService());
+        Assert.assertEquals("WsLargeDataIO", prov.getService());
     }
 }
