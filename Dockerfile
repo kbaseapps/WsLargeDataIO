@@ -7,6 +7,12 @@ MAINTAINER KBase Developer
 
 # RUN apt-get update
 
+# update jars
+RUN cd /kb/dev_container/modules/jars \
+	&& git pull \
+	&& . /kb/dev_container/user-env.sh \
+	&& make deploy
+
 # -----------------------------------------
 
 COPY ./ /kb/module
