@@ -12,7 +12,7 @@ from __future__ import print_function
 try:
     # baseclient and this client are in a package
     from .baseclient import BaseClient as _BaseClient  # @UnusedImport
-except:
+except ImportError:
     # no they aren't
     from baseclient import BaseClient as _BaseClient  # @Reimport
 
@@ -23,7 +23,7 @@ class WsLargeDataIO(object):
             self, url=None, timeout=30 * 60, user_id=None,
             password=None, token=None, ignore_authrc=False,
             trust_all_ssl_certificates=False,
-            auth_svc='https://kbase.us/services/authorization/Sessions/Login'):
+            auth_svc='https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login'):
         if url is None:
             raise ValueError('A url is required')
         self._service_ver = None
@@ -79,9 +79,8 @@ class WsLargeDataIO(object):
            parameter "chsum" of String, parameter "size" of Long, parameter
            "meta" of mapping from String to String
         """
-        return self._client.call_method(
-            'WsLargeDataIO.save_objects',
-            [params], self._service_ver, context)
+        return self._client.call_method('WsLargeDataIO.save_objects',
+                                        [params], self._service_ver, context)
 
     def get_objects(self, params, context=None):
         """
@@ -160,9 +159,8 @@ class WsLargeDataIO(object):
            parameter "chsum" of String, parameter "size" of Long, parameter
            "meta" of mapping from String to String
         """
-        return self._client.call_method(
-            'WsLargeDataIO.get_objects',
-            [params], self._service_ver, context)
+        return self._client.call_method('WsLargeDataIO.get_objects',
+                                        [params], self._service_ver, context)
 
     def status(self, context=None):
         return self._client.call_method('WsLargeDataIO.status',

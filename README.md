@@ -8,6 +8,9 @@ This is the basic readme for this module. Include any usage or deployment instru
 
 ### Release Notes
 
+#### 0.0.4
+- Update Java to OpenJDK 8 to enable TLS1.2
+
 #### 0.0.3
 - Fix SSL cert issue
 - Make Auth environment configurable
