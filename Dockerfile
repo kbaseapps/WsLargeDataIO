@@ -15,6 +15,7 @@ RUN apt-get update \
 
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
 
+RUN pip install configparser
 
 # Clone KBase jars repository
 RUN git clone https://github.com/kbase/jars /tmp/repo
