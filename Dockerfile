@@ -1,34 +1,26 @@
-FROM kbase/kbase:sdkbase.latest
+FROM kbase/sdkpython:3.8.10
 MAINTAINER KBase Developer
 # -----------------------------------------
-
-# Insert apt-get instructions here to install
-# any required dependencies for your module.
-
-# RUN apt-get update
-
-# update java
-RUN add-apt-repository ppa:openjdk-r/ppa \
-	&& sudo apt-get update \
-	&& sudo apt-get -y install openjdk-8-jdk \
+# Install any required dependencies for your module
+RUN apt-get update \
+	&& apt-get install -y ant openjdk-8-jdk \
 	&& echo java versions: \
 	&& java -version \
 	&& javac -version \
 	&& echo $JAVA_HOME \
 	&& ls -l /usr/lib/jvm \
-	&& cd /kb/runtime \
-	&& rm java \
-	&& ln -s /usr/lib/jvm/java-8-openjdk-amd64 java \
-	&& ls -l
+	&& rm -rf /var/lib/apt/lists/*
 
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
+RUN pip install configparser
 
-# update jars
-RUN cd /kb/dev_container/modules/jars \
-	&& git pull \
-	&& . /kb/dev_container/user-env.sh \
-	&& make deploy
+# Set ANT_HOME environment variable and verify Ant installation
+ENV ANT_HOME=/usr/share/ant
+RUN ant -version
 
+# Clone KBase jars repository
+RUN git clone https://github.com/kbase/jars /tmp/repo
+RUN mv /tmp/repo/* /kb/deployment && rm -r /tmp/repo
 # -----------------------------------------
 
 COPY ./ /kb/module
