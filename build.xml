@@ -1,4 +1,4 @@
-<project name="WsLargeDataIO" default="coverage" basedir=".">
+<project name="WsLargeDataIO" default="compile" basedir=".">
 
   <description>
       Build JAR and WAR files for WsLargeDataIO 
@@ -17,10 +17,6 @@
   <property name="web.xml" location="${scripts}/web.xml"/>
   <property name="exec.cmd.file" value="run_WsLargeDataIO_async_job.sh"/>
   <property name="startup.cmd.file" value="start_server.sh"/>
-  <property name="jacoco.jar" value="${jars.dir}/jacoco/jacocoagent.jar"/>
-  <property name="jacoco.report.dir" value="${dist}/coverage"/>
-  <property name="jacoco.exec" value="${jacoco.report.dir}/jacoco.exec"/>
-  <property name="jacoco.report.html" value="${jacoco.report.dir}/html"/>
 
   <fileset dir="${jars.dir}" id="lib">
     <include name="ini4j/ini4j-0.5.2.jar"/>
@@ -100,9 +96,7 @@ java -cp ${jar.absolute.path}:${lib.classpath} wslargedataio.WsLargeDataIOServer
     <chmod file="${bin}/${exec.cmd.file}" perm="a+x"/>
   </target>
   
-  <!-- Run tests and generate coverage report -->
-  <target name="test" description="run all tests and generate coverage report">
-    <mkdir dir="${jacoco.report.dir}"/>
+  <target name="test" description="run all tests">
     <junit printsummary="yes" haltonfailure="yes" fork="true">
       <classpath>
         <pathelement location="${dist}/${jar.file}"/>
@@ -114,19 +108,6 @@ java -cp ${jar.absolute.path}:${lib.classpath} wslargedataio.WsLargeDataIOServer
           <include name="**/test/**Test.java"/>
         </fileset>
       </batchtest>
-      <jvmarg value="-javaagent:${jacoco.jar}=destfile=${jacoco.exec}"/>
     </junit>
   </target>
-
-  <!-- Generate JaCoCo HTML report -->
-  <target name="coverage" depends="test" description="generate JaCoCo HTML coverage report">
-    <mkdir dir="${jacoco.report.html}"/>
-    <java jar="${jacoco.jar}" fork="true">
-      <arg value="report"/>
-      <arg value="${jacoco.exec}"/>
-      <arg value="--html"/>
-      <arg value="${jacoco.report.html}"/>
-    </java>
-  </target>
-
 </project>
