@@ -3,13 +3,12 @@ MAINTAINER KBase Developer
 # -----------------------------------------
 # Install any required dependencies for your module
 RUN apt-get update \
-	&& apt-get install -y wget unzip ant openjdk-8-jdk \
+	&& apt-get install -y ant openjdk-8-jdk \
 	&& echo java versions: \
 	&& java -version \
 	&& javac -version \
 	&& echo $JAVA_HOME \
 	&& ls -l /usr/lib/jvm \
-	&& ls -l \
 	&& rm -rf /var/lib/apt/lists/*
 
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
