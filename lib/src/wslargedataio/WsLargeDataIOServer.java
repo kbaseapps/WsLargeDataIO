@@ -31,9 +31,9 @@ import us.kbase.workspace.ProvenanceAction;
  */
 public class WsLargeDataIOServer extends JsonServerServlet {
     private static final long serialVersionUID = 1L;
-    private static final String version = "0.0.4";
-    private static final String gitUrl = "https://github.com/mrcreosote/wslargedataio.git";
-    private static final String gitCommitHash = "74af017553a393b2c46b1f67088dd3c2d333ad3f";
+    private static final String version = "0.0.6";
+    private static final String gitUrl = "git@github.com:kbaseapps/WsLargeDataIO.git";
+    private static final String gitCommitHash = "727b76e14905f94ab91f24c7936d5bcb832c774c";
 
     //BEGIN_CLASS_HEADER
     
