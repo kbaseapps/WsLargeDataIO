@@ -1,5 +1,5 @@
 ### Version  0.0.6
-- Updated the Dockerfile so that updated Docker daemon in GHA will pull the image
+- Updated the Dockerfile so that the updated Docker daemon in GHA will pull the image
 - Upgraded kb-sdk with patch in GHA
 
 ### Version  0.0.5
